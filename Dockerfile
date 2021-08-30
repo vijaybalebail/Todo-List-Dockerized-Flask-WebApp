@@ -1,6 +1,4 @@
-[root@vj-oci-docker Todo-List-Dockerized-Flask-WebApp]# cat Dockerfile
-# build the image based on python:3.8-slim-buster image
-#FROM python:3.8-slim-buster
+# build the image based on oraclelinux:7-slim image
 FROM oraclelinux:7-slim
 
 RUN yum -y install oraclelinux-developer-release-el7 oracle-instantclient-release-el7 && \
@@ -8,13 +6,13 @@ RUN yum -y install oraclelinux-developer-release-el7 oracle-instantclient-releas
                    python3-libs \
                    python3-pip \
                    python3-setuptools \
+                   python3-bson \
                    python36-cx_Oracle && \
     rm -rf /var/cache/yum/*
 
 
-
 # metadata in the form of key=value about the maintainer of the image
-LABEL Maintainer_Name="Vijay Balebail" Maintainer_Email="vbalebai@gmail.com"
+LABEL Maintainer_Name="Vijay balebail" Maintainer_Email="vijay.balebail@oracle.com"
 
 # the work directory inside the container
 WORKDIR /
@@ -22,6 +20,7 @@ WORKDIR /
 # set enviournment variables
 ENV FLASK_APP app.py
 ENV FLASK_ENV development
+ENV TNS_ADMIN="/app"
 
 # copy the requirements file inside the container
 COPY ./requirements.txt /requirements.txt
@@ -31,6 +30,9 @@ RUN pip3 install -r requirements.txt
 
 RUN mkdir app
 WORKDIR /app
+ADD config.cfg /app
+ADD cwallet.sso /app
+
 
 # copy the project artefects into the container under the root directory
 COPY . .
