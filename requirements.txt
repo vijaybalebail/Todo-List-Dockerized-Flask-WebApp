@@ -8,3 +8,4 @@ Jinja2==2.11.3
 MarkupSafe==1.1.1
 SQLAlchemy==1.4.12
 Werkzeug==1.0.1
+flask-restplus>=0.13.0
