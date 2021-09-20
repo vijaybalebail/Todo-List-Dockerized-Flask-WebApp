@@ -1,5 +1,6 @@
-# build the image based on python:3.8-slim-buster image
-#FROM python:3.8-slim-buster
+# build the image based on oraclelinux:7-slim
+# install the latest version of python drives for Oracle.
+# add Docker application into container and run.
 FROM oraclelinux:7-slim
 
 RUN yum -y install oraclelinux-developer-release-el7 oracle-instantclient-release-el7 && \
@@ -13,12 +14,12 @@ RUN yum -y install oraclelinux-developer-release-el7 oracle-instantclient-releas
 
 
 # metadata in the form of key=value about the maintainer of the image
-LABEL Maintainer_Name="Vijay balebail" Maintainer_Email="vijay.balebail@oracle.com" 
+LABEL Maintainer_Name="Vijay balebail" Maintainer_Email="vijay.balebail@oracle.com"
 
 # the work directory inside the container
 WORKDIR /
 
-# set enviournment variables 
+# set enviournment variables
 ENV FLASK_APP app.py
 ENV FLASK_ENV development
 ENV TNS_ADMIN="/app"
@@ -33,10 +34,13 @@ RUN mkdir app
 WORKDIR /app
 ADD config.cfg /app
 ADD cwallet.sso /app
+ADD sqlnet.ora /app
+ADD tnsnames.ora /app
+
 
 
 # copy the project artefects into the container under the root directory
 COPY . .
 
-# the command to run once we run the container 
+# the command to run once we run the container
 CMD python3 app.py

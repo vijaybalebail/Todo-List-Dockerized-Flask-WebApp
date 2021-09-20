@@ -14,7 +14,7 @@
     <div style="margin-top: 50px;" class="ui container">
         <h1 class="ui center aligned header">To Do App</h1>
 
-        <form class="ui form" action="/add" method="POST">
+        <form class="ui form" action="/todolist/add" method="POST">
             <div class="field">
                 <label>Task Title</label>
                 <input type="text" name="title" placeholder="Enter Todo..."><br>
@@ -33,13 +33,13 @@
             {% else %}
             <span class="ui green label">Completed</span>
             {% endif %}
-            
+
             {% if todo.complete == False %}
-            <a class="ui blue button" href="/update/{{ todo.id }}">Finished</a>
+            <a class="ui blue button" href="/todolist/update/{{ todo.id }}">Finished</a>
             {% else %}
-            <a class="ui blue button" href="/update/{{ todo.id }}">Not Finished</a>
+            <a class="ui blue button" href="/todolist/update/{{ todo.id }}">Not Finished</a>
             {% endif %}
-            <a class="ui red button" href="/delete/{{ todo.id }}">Delete</a>
+            <a class="ui red button" href="/todolist/delete/{{ todo.id }}">Delete</a>
         </div>
         {% endfor %}
     </div>
