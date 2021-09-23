@@ -99,7 +99,7 @@ def update(todo_id):
 
 
 # print url
-@app.route('/todolist/foo2')
+@app.route('/todolist/foo')
 def foo():
     return request.base_url
 
