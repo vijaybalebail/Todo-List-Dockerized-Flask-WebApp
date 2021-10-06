@@ -23,13 +23,13 @@ spec:
     spec:
       containers:
       - name: pythonwebfsd
-    # enter the path to your image, be sure to include the correct region prefix    
+    # enter the path to your image, be sure to include the correct region prefix
         image: sjc.ocir.io/oraclepartnersas/todolist-flask:v3
         ports:
         - containerPort: 5000
       imagePullSecrets:
-    # enter the name of the secret you created  
-      - name: pythonwebsecret
+    # enter the name of the secret you created
+      - name: todolistpullsecret3
 ---
 apiVersion: v1
 kind: Service
