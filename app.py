@@ -1,20 +1,38 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import exc
-#from datetime import datetime
+from sqlalchemy import create_engine
+from sqlalchemy.pool import NullPool
 import os
 import cx_Oracle
 
 
+
 app = Flask(__name__)
+
 app.config.from_pyfile('config.cfg')
+
 dnsStr1 = 'oracle://' + app.config['ADB_USER'] + ':' + app.config['ADB_PASSWORD'] + '@' + app.config['ADB_TNSNAMES']
-print("the new connect string passed is " +dnsStr1)
-app.config['SQLALCHEMY_DATABASE_URI'] = dnsStr1
+print("the new connect string passed session pool is  " +dnsStr1)
+
+#configure session pool to connect to database
+pool = cx_Oracle.SessionPool(user="ADMIN", password="Saturday_123", dsn="simba_pool", min=2, max=2, increment=0, getmode=cx_Oracle.SPOOL_ATTRVAL_WAIT)
+
+def mycreator():
+    return pool.acquire(cclass="MYCLASS", purity=cx_Oracle.ATTR_PURITY_SELF)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = "oracle://"
+# from Session pooling only
+#app.config['SQLALCHEMY_ENGINE_OPTIONS'] = { "creator": pool.acquire, "poolclass": NullPool, "max_identifier_length": 128 }
+
+#For Session pooling and DRCP
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = { "creator": mycreator, "poolclass": NullPool, "max_identifier_length": 128 }
 
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+
+# Initialise
 db = SQLAlchemy(app)
 
 class Todo(db.Model):
@@ -31,7 +49,6 @@ def index():
 
     todoList = Todo.query.all()
     base_url = request.base_url
-    print(base_url + "lalalal")
     return render_template('base.html', todo_list=todoList)
 
 # add a task
@@ -44,9 +61,9 @@ def add():
 
     # if the title is empty then redirect to the index page
     if title == "":
-        #return redirect(url_for("index"))
-        return redirect(url_for('index',_external=True))
-        #return redirect("https://kfrrrawkihgxpzbl4givuba3pi.apigateway.us-sanjose-1.oci.customer-oci.com/todolist/todos", code=303)
+        return redirect(url_for("index"))
+        #return redirect(url_for('index',_external=True))
+
     # create a todo object
     newTask = Todo(task=title, complete=False)
 
@@ -54,9 +71,8 @@ def add():
     try:
         db.session.add(newTask)
         db.session.commit()
-        #return redirect(url_for("index"))
-        return redirect(url_for('index',_external=True))
-        #return redirect("https://kfrrrawkihgxpzbl4givuba3pi.apigateway.us-sanjose-1.oci.customer-oci.com/todolist/todos", code=303)
+        return redirect(url_for("index"))
+        #return redirect(url_for('index',_external=True))
     except exc.SQLAlchemyError as e:
         print(type(e))
         error = str(e.__dict__['orig'])
@@ -73,8 +89,8 @@ def delete(todo_id):
     try:
         db.session.delete(task)
         db.session.commit()
-        #return redirect(url_for("index"))
-        return redirect(url_for('index',_external=True))
+        return redirect(url_for("index"))
+        #return redirect(url_for('index',_external=True))
     except:
         return "There was an issue deleting your task."
 
@@ -91,40 +107,24 @@ def update(todo_id):
     # try to commit to the database
     try:
         db.session.commit()
-        #return redirect(url_for("index"))
-        return redirect(url_for('index',_external=True))
+        return redirect(url_for("index"))
+        #return redirect(url_for('index',_external=True))
     except:
         return "There was an issue deleting your task."
 
 
 
 # print url
-@app.route('/todolist/foo')
+@app.route('/todolist/foo2')
 def foo():
     return request.base_url
 
 
 if __name__ == "__main__":
 
-    #connection = cx_Oracle.connect("SSB", "Ora_DB4U", "129.146.115.121/orclpdb")
-
-    #cursor = connection.cursor()
-    #cursor.execute("select systimestamp from dual")
-    #r, = cursor.fetchone()
-    #print( r.strftime("%m/%d/%Y, %H:%M:%S") + ' is the time' )
 
     app.config.from_pyfile('config.cfg')
 
-
     db.create_all()
     port = int(os.environ.get('PORT', 5000))
-
     app.run(host = '0.0.0.0', port = port)
-
-
-    '''
-
-
-
-
-'''
