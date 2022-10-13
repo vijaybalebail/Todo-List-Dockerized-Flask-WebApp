@@ -8,7 +8,7 @@ import cx_Oracle
 
 
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/static')
 
 app.config.from_pyfile('config.cfg')
 
@@ -16,7 +16,8 @@ dnsStr1 = 'oracle://' + app.config['ADB_USER'] + ':' + app.config['ADB_PASSWORD'
 print("the new connect string passed session pool is  " +dnsStr1)
 
 #configure session pool to connect to database
-pool = cx_Oracle.SessionPool(user="ADMIN", password="Saturday_123", dsn="simba_pool", min=2, max=2, increment=0, getmode=cx_Oracle.SPOOL_ATTRVAL_WAIT)
+
+pool = cx_Oracle.SessionPool(user=app.config['ADB_USER'], password=app.config['ADB_PASSWORD'], dsn=app.config['ADB_TNSNAMES'], min=2, max=2, increment=0, getmode=cx_Oracle.SPOOL_ATTRVAL_WAIT)
 
 def mycreator():
     return pool.acquire(cclass="MYCLASS", purity=cx_Oracle.ATTR_PURITY_SELF)
@@ -50,6 +51,14 @@ def index():
     todoList = Todo.query.all()
     base_url = request.base_url
     return render_template('base.html', todo_list=todoList)
+
+@app.route('/todolist/imagemap')
+def index1():
+
+    todoList = Todo.query.all()
+    base_url = request.base_url
+    return render_template('imagemap.html', todo_list=todoList)
+
 
 # add a task
 @app.route('/todolist/add', methods=["POST"])
@@ -117,7 +126,7 @@ def update(todo_id):
 # print url
 @app.route('/todolist/foo2')
 def foo():
-    return request.base_url
+    return request.base_url+' is the url\n'
 
 
 if __name__ == "__main__":
