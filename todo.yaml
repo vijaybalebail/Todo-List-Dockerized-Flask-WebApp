@@ -1,12 +1,4 @@
-apiVersion: v1
-kind: Secret
-metadata:
-  name: mysecret
-type: Opaque
-stringData:
-  superuser: 'admin'
-  spassword: 'Saturday_123'
----
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
